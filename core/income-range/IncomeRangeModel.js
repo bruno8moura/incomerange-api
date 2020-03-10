@@ -1,15 +1,31 @@
 class IncomeRangeModel {
-    constructor(id=0, descricao){
+    constructor(id, min, max, currency, currencyDesc){
+
         this._id = id;
-        this._descricao = descricao;
+        this._min = min;
+        this._max = max;
+        this._currency = currency;        
+        this._currencyDesc = currencyDesc;
     }
 
     get id() {
-        return this._id;
+        return this.id;
+    }
+    
+    get min() {
+        return this.min;
+    }
+    
+    get max() {
+        return this.max;
+    }
+    
+    get currency() {
+        return this.currency;
     }
 
-    get descricao() {
-        return this._descricao;
+    get currencyDesc() {
+        return this.currencyDesc;
     }
 }
 

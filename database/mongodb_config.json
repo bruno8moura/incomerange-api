@@ -1,8 +1,11 @@
 {
     "host": "localhost",
     "port": 28017,
-    "dbname": "customdatadb",
-    "collection": "incomerange",
+    "database": "customdatadb",
+    "collection": {
+        "incomerange": "incomerange",
+        "sequence": "sequence"
+    },
     "user": "incomerange",
     "password": "incomerange1234"
 }

@@ -1,5 +1,7 @@
-const routes = require('./IncomeRangeRoutes');
+const routes = require('./IncomeRangeRoutes').routes;
 const db = require('../../database/db');
+const mongodb = require('../../database/mongodb_config.json');
+const actions = require('./actions');
 
 module.exports = ({ app, router }) => {
 
@@ -7,37 +9,34 @@ module.exports = ({ app, router }) => {
         new Promise((resolve, reject) => {
 
             try {
-                let collection = db.get().collection('incomerange');
+                let collection = db.get().collection(mongodb.collection.incomerange);
 
                 collection.find().toArray((err, docs) => {
                     if (err) {
                         console.log('REJECT!');
-                        
-                        reject(err);                        
+                        throw new Error(err);
                     }
                     resolve(docs);
                 });
             } catch (error) {
-                console.log('THROW ERROR!');
-                throw new Error(err);
+                console.log(`THROW ERROR! ${error}`);
+                reject(error);
             }
         })
-            .then((docs) => {
-                res.statusCode = 200;
-                res.send({ 'docs': docs });
-                res.end();
-            })
-            .catch(err => {
-                let message = { 'error': `${err}`, 'description': 'Não foi possível acessar o banco de dados.' }
-                res.statusCode = 500;
-                res.send(message);
-                res.end();
-            });
+        .then((incomeranges) => {
+            res.statusCode = 200;
+            res.send({ incomeranges });
+            res.end();
+        })
+        .catch(err => {
+            let message = { 'error': `${err}`, 'description': 'Não foi possível acessar o banco de dados.' }
+            res.statusCode = 500;
+            res.send(message);
+            res.end();
+        });
     });
+
+    router.post( routes.INCOME_RANGES, actions.createANewIncomeRange);
 
     app.use(routes.BASE, router);
 };
-
-
-
-
