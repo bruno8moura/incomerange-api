@@ -34,25 +34,26 @@ class IncomeRangeDAO {
                 //TODO some log here
                 reject(e);
             }
-        })
-            .then(({ value }) => {
-                let { sequence_value } = value;
-                incomeRange.id = sequence_value;
+        }).then(({ value }) => {
+            let { sequence_value } = value;
+            incomeRange.id = sequence_value;
 
-                return incomeRange;
-            })
-            .then(incomeRange => {
-                let conn = db.get().collection(this._collection.incomerange);
-                let result = conn.insertOne(incomeRange);
+            return incomeRange;
+        }).then(incomeRange => {
+            let conn = db.get().collection(this._collection.incomerange);
+            let result = conn.insertOne(incomeRange);
 
-                return result;
-            })
-            .catch(e => {
-                //TODO some log here
-                console.log(e);
+            return result;
+        }).then((objectInserted) => {
+            let incomerange = objectInserted.ops[0];
 
-                return e;
-            });
+            return incomeRange;
+        }).catch(e => {
+            //TODO some log here
+            console.log(e);
+
+            return e;
+        });
     }
 
     list(filter) {
@@ -62,13 +63,12 @@ class IncomeRangeDAO {
 
                 collection.find().toArray((err, docs) => {
                     if (err) {
-                        console.log('REJECT!');
                         throw new Error(err);
                     }
                     resolve(docs);
                 });
             } catch (error) {
-                console.log(`THROW ERROR! ${error}`);
+                //TODO some log here
                 reject(error);
             }
         });

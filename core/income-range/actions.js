@@ -11,24 +11,20 @@ actions.createANewIncomeRange = function (req, res) {
     console.log(`body request ${JSON.stringify(data)}`);
     return new Promise((resolve, reject) => {
         try {
-            console.log(1);
-
             let dao = new IncomeRangeDAO();
             resolve(dao.insert(data));
         } catch (error) {
             reject(error);
         }
-    })
-        .then(result => {
-            res.setHeader('Location', `${routes.INCOME_RANGES}/${result.id}`);
-            res.statusCode = 302;
-            res.end();
-        })
-        .catch(result => {
-            res.statusCode = 500;
-            res.send({ 'message': 'Was not possible create the object Income Range.', 'error': `${result}` });
-            res.end();
-        });
+    }).then( result => {
+        res.setHeader('Location', `${routes.INCOME_RANGES}/${result.id}`);
+        res.statusCode = 201;
+        res.end();
+    }).catch(result => {
+        res.statusCode = 500;
+        res.send({ 'message': 'Was not possible create the object Income Range.', 'error': `${result}` });
+        res.end();
+    });
 
 };
 
@@ -37,7 +33,7 @@ actions.listIncomeRanges = function (req, res) {
         resolve(new IncomeRangeDAO().list());
     }).then(resolved => {
         res.statusCode = 200;
-        res.send({ 'docs': resolved });
+        res.send({ 'incomeranges': resolved });
         res.end();
     }).catch(error => {
         res.statusCode = 500;
