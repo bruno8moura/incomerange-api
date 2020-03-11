@@ -1,5 +1,6 @@
 const IncomeRangeDAO = require('./IncomeRangeDAO');
 const routes = require('./IncomeRangeRoutes').routes;
+const Message = require('../error/Message');
 let actions = new Object();
 
 actions.createANewIncomeRange = function (req, res) {
@@ -8,27 +9,41 @@ actions.createANewIncomeRange = function (req, res) {
     //TODO HOW TO DEAL WITH RETURNS TO CLIENT?
 
     console.log(`body request ${JSON.stringify(data)}`);
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         try {
             console.log(1);
-            
-            let dao = new IncomeRangeDAO();
-            resolve( dao.insert(data) );
-        } catch (error) {
-            reject( error );
-        }
-    } )
-    .then( result => {
-        res.setHeader('Location', `${routes.INCOME_RANGES}/${result.id}`);
-        res.statusCode = 302;
-        res.end();
-    })
-    .catch( result => {
-        res.statusCode = 500;
-        res.send({'message': 'Was not possible create the object Income Range.', 'error': `${result}`});
-        res.end();
-    } );
 
+            let dao = new IncomeRangeDAO();
+            resolve(dao.insert(data));
+        } catch (error) {
+            reject(error);
+        }
+    })
+        .then(result => {
+            res.setHeader('Location', `${routes.INCOME_RANGES}/${result.id}`);
+            res.statusCode = 302;
+            res.end();
+        })
+        .catch(result => {
+            res.statusCode = 500;
+            res.send({ 'message': 'Was not possible create the object Income Range.', 'error': `${result}` });
+            res.end();
+        });
+
+};
+
+actions.listIncomeRanges = function (req, res) {
+    return new Promise((resolve, reject) => {
+        resolve(new IncomeRangeDAO().list());
+    }).then(resolved => {
+        res.statusCode = 200;
+        res.send({ 'docs': resolved });
+        res.end();
+    }).catch(error => {
+        res.statusCode = 500;
+        res.send(new Message('Was not possible to retrive any Income range.', error));
+        res.end();
+    });
 };
 
 module.exports = actions;

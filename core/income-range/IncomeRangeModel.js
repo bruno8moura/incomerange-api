@@ -9,23 +9,23 @@ class IncomeRangeModel {
     }
 
     get id() {
-        return this.id;
+        return this._id;
     }
     
     get min() {
-        return this.min;
+        return this._min;
     }
     
     get max() {
-        return this.max;
+        return this._max;
     }
     
     get currency() {
-        return this.currency;
+        return this._currency;
     }
 
     get currencyDesc() {
-        return this.currencyDesc;
+        return this._currencyDesc;
     }
 }
 
