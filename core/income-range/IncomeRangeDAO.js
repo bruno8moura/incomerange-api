@@ -1,5 +1,5 @@
 const db = require('../../database/db');
-const IdQueryFilterBuilder = require('../../database/utils/QueryFilterBuilder');
+const IdQueryFilterBuilder = require('../../database/mongodbutils/QueryFilterBuilder');
 
 class IncomeRangeDAO {
     constructor() {
@@ -69,7 +69,6 @@ class IncomeRangeDAO {
                     if (err) {
                         throw new Error(err);
                     }
-                    console.log(results);
                     
                     if(1 < results.length){
                         let docs = new Object();
