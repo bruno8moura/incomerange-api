@@ -9,5 +9,7 @@ module.exports = ({ app, router }) => {
 
     router.post(routes.INCOME_RANGES, actions.createANewIncomeRange);
 
+    router.delete(routes.A_INCOME_RANGE, actions.deleteAIncomeRange);
+
     app.use(routes.BASE, router);
 };

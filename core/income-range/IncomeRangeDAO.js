@@ -1,4 +1,5 @@
 const db = require('../../database/db');
+const IdQueryFilterBuilder = require('../../database/utils/QueryFilterBuilder');
 
 class IncomeRangeDAO {
     constructor() {
@@ -71,6 +72,30 @@ class IncomeRangeDAO {
                 //TODO some log here
                 reject(error);
             }
+        });
+    }
+
+    delete(id) {
+        return new Promise( (resolve, reject) => {
+            try {
+                let id_database = new IdQueryFilterBuilder().setId(id).build().id
+                let collection = db.get().collection(this._collection.incomerange);
+                
+                resolve(collection.findOneAndUpdate(
+                    { id: id_database },
+                    { $set: { enabled: false } },
+                    { returnNewDocument: true }
+                ));   
+                
+            } catch (error) {
+                  //TODO some log here
+                  reject(error);
+            }
+        }).then( deletionResult => {
+            let result = new Object();
+            result.success = deletionResult.lastErrorObject.updatedExisting;
+            
+            return result;
         });
     }
 }
