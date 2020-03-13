@@ -1,6 +1,4 @@
 const routes = require('./IncomeRangeRoutes').routes;
-const db = require('../../database/db');
-const mongodb = require('../../database/mongodb_config.json');
 const actions = require('./actions');
 
 module.exports = ({ app, router }) => {
