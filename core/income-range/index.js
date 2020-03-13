@@ -11,5 +11,7 @@ module.exports = ({ app, router }) => {
 
     router.delete(routes.A_INCOME_RANGE, actions.deleteAIncomeRange);
 
+    router.get(routes.A_INCOME_RANGE, actions.findAIncomeRange);
+
     app.use(routes.BASE, router);
 };

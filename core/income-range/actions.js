@@ -57,4 +57,25 @@ actions.deleteAIncomeRange = function(req, res) {
     });
 }
 
+actions.findAIncomeRange = function(req, res) {    
+    return new Promise( (resolve, reject) => {
+        let incomerangeid = isNaN( req.params.id ) ? 0 : parseInt(req.params.id);
+        if(incomerangeid === 0){
+            return resolve();
+        }
+
+        let filter = new Object();
+        filter.id = incomerangeid;
+        resolve(new IncomeRangeDAO().list(filter));
+    } ).then( resolved => {
+        res.statusCode = resolved ? 200 : 404;
+        res.send(resolved);
+        res.end();
+    }).catch( error => {
+        res.statusCode = 500;
+        res.send(`Was not possible to retrive any Income Range, ${error}`);
+        res.end();
+    });
+}
+
 module.exports = actions;

@@ -60,13 +60,26 @@ class IncomeRangeDAO {
     list(filter) {
         return new Promise((resolve, reject) => {
             try {
+                let id_database = new IdQueryFilterBuilder().setId( filter.id ).build().id
                 let collection = db.get().collection(this._collection.incomerange);
-
-                collection.find().toArray((err, docs) => {
+                let query = new Object();
+                query.id = id_database;
+                
+                collection.find(query).toArray((err, results) => {
                     if (err) {
                         throw new Error(err);
                     }
-                    resolve(docs);
+                    console.log(results);
+                    
+                    if(1 < results.length){
+                        let docs = new Object();
+                        docs.incomeranges = results;
+                        resolve(docs);
+
+                        return;
+                    }
+
+                    resolve(results[0]);
                 });
             } catch (error) {
                 //TODO some log here
