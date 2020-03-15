@@ -60,17 +60,18 @@ class IncomeRangeDAO {
     list(filter) {
         return new Promise((resolve, reject) => {
             try {
-                let id_database = new IdQueryFilterBuilder().setId( filter.id ).build().id
-                let collection = db.get().collection(this._collection.incomerange);
-                let query = new Object();
-                query.id = id_database;
-                
+               let query = new Object();
+               let collection = db.get().collection(this._collection.incomerange);
+                if (filter) {
+                    let id_database = new IdQueryFilterBuilder().setId(filter.id).build().id
+                    query.id = id_database;
+                }
                 collection.find(query).toArray((err, results) => {
                     if (err) {
                         throw new Error(err);
                     }
-                    
-                    if(1 < results.length){
+
+                    if (1 < results.length) {
                         let docs = new Object();
                         docs.incomeranges = results;
                         resolve(docs);
@@ -88,25 +89,25 @@ class IncomeRangeDAO {
     }
 
     delete(id) {
-        return new Promise( (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             try {
                 let id_database = new IdQueryFilterBuilder().setId(id).build().id
                 let collection = db.get().collection(this._collection.incomerange);
-                
+
                 resolve(collection.findOneAndUpdate(
                     { id: id_database },
                     { $set: { enabled: false } },
                     { returnNewDocument: true }
-                ));   
-                
+                ));
+
             } catch (error) {
-                  //TODO some log here
-                  reject(error);
+                //TODO some log here
+                reject(error);
             }
-        }).then( deletionResult => {
+        }).then(deletionResult => {
             let result = new Object();
             result.success = deletionResult.lastErrorObject.updatedExisting;
-            
+
             return result;
         });
     }
