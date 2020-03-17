@@ -11,5 +11,7 @@ module.exports = ({ app, router }) => {
 
     router.get(routes.A_INCOME_RANGE, actions.findAIncomeRange);
 
+    router.patch( routes.A_INCOME_RANGE, actions.patchAIncomeRange );
+
     app.use(routes.BASE, router);
 };

@@ -60,10 +60,10 @@ class IncomeRangeDAO {
     list(filter) {
         return new Promise((resolve, reject) => {
             try {
-               let query = new Object();
-               let collection = db.get().collection(this._collection.incomerange);
+                let query = new Object();
+                let collection = db.get().collection(this._collection.incomerange);
                 if (filter) {
-                    let id_database = new IdQueryFilterBuilder().setId(filter.id).build().id
+                    let id_database = new IdQueryFilterBuilder().setId(filter.id).build().id;
                     query.id = id_database;
                 }
                 collection.find(query).toArray((err, results) => {
@@ -71,15 +71,10 @@ class IncomeRangeDAO {
                         throw new Error(err);
                     }
 
-                    if (1 < results.length) {
-                        let docs = new Object();
-                        docs.incomeranges = results;
-                        resolve(docs);
+                    let docs = new Object();
+                    docs.incomeranges = results;
+                    resolve(docs);
 
-                        return;
-                    }
-
-                    resolve(results[0]);
                 });
             } catch (error) {
                 //TODO some log here
@@ -91,7 +86,7 @@ class IncomeRangeDAO {
     delete(id) {
         return new Promise((resolve, reject) => {
             try {
-                let id_database = new IdQueryFilterBuilder().setId(id).build().id
+                let id_database = new IdQueryFilterBuilder().setId(id).build().id;
                 let collection = db.get().collection(this._collection.incomerange);
 
                 resolve(collection.findOneAndUpdate(
@@ -109,6 +104,50 @@ class IncomeRangeDAO {
             result.success = deletionResult.lastErrorObject.updatedExisting;
 
             return result;
+        });
+    }
+
+    patch(id, data) {
+        return new Promise((resolve, reject) => {
+            try {
+                let id_database = new IdQueryFilterBuilder().setId(id).build().id;
+                let collection = db.get().collection(this._collection.incomerange);
+
+                resolve(collection.findOneAndUpdate(
+                    { id: id_database },
+                    { $set: data },
+                    { returnOriginal: false }
+                ));
+
+            } catch (error) {
+                //TODO some log here
+                reject(error);
+            }
+        }).then(patchResult => {
+            let result = new Object();
+            result.success = patchResult.lastErrorObject.updatedExisting;
+            result.updatedData = patchResult.value;
+            console.log(result);
+
+            return result;
+        });
+    }
+
+    findOne(filter) {
+        return new Promise((resolve, reject) => {
+            try {
+                let query = new Object();
+                let collection = db.get().collection(this._collection.incomerange);
+                if (filter) {
+                    let id_database = new IdQueryFilterBuilder().setId(filter.id).build().id;
+                    query.id = id_database;
+                }
+
+                resolve(collection.findOne(query));
+            } catch (error) {
+                //TODO some log here
+                reject(error);
+            }
         });
     }
 }

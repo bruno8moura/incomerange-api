@@ -1,6 +1,7 @@
 const IncomeRangeDAO = require('./IncomeRangeDAO');
-const routes = require('./IncomeRangeRoutes').routes;
+const { routes } = require('./IncomeRangeRoutes');
 const Message = require('../error/Message');
+const jsonPatch = require('json-patch');
 let actions = new Object();
 
 actions.createANewIncomeRange = function (req, res) {
@@ -74,6 +75,43 @@ actions.findAIncomeRange = function(req, res) {
     }).catch( error => {
         res.statusCode = 500;
         res.send(`Was not possible to retrive any Income Range, ${error}`);
+        res.end();
+    });
+}
+
+actions.patchAIncomeRange = function(req, res) {    
+    let incomerangeid = isNaN( req.params.id ) ? 0 : parseInt(req.params.id);
+    let { patches } = req.body;
+    return new Promise( (resolve, reject) => {
+        if(incomerangeid === 0){
+            return resolve();
+        }
+        
+        let filter = new Object();
+        filter.id = incomerangeid;
+        let aIncomeRange = new IncomeRangeDAO().findOne(filter);
+
+        resolve( aIncomeRange );
+    }).then( aIncomeRange => {
+        if(aIncomeRange){
+            jsonPatch.apply( aIncomeRange, patches );
+            return Promise.resolve(new IncomeRangeDAO().patch(incomerangeid, aIncomeRange));        
+        }
+
+        return Promise.resolve();        
+    }).then( resolved => {
+        if( !resolved ) {
+            res.status(404);
+        }
+
+        res.status(204);
+        res.setHeader('Location', req.path);
+        
+        res.end(); 
+    }).catch( error => {
+        //some log here ${error}
+        let message = new Message(`Was not possible perform operation, sorry about that. Wait a minute and try later or, if the problem persists, contact the administrator. ;)`);
+        res.status(500).send(message);
         res.end();
     });
 }
