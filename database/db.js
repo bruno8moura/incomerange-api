@@ -1,3 +1,4 @@
+const logger = require('../logger').logger();
 var MongoClient = require('mongodb').MongoClient;
 
 var state = {
@@ -11,8 +12,12 @@ exports.connect = function (url, database, done) {
         url,
         { useUnifiedTopology: true },
         function (err, client) {
-            if (err) return done(err);
-
+            if (err) {
+                logger.error( 'Was not possible connect to database: ' );
+                logger.error( err );
+                return done(err);
+            }
+            logger.info('Mongodb connected.');
             state.db = client.db( database );
             done();
         }
