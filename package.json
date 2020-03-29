@@ -18,7 +18,8 @@
     "express": "^4.17.1",
     "json-patch": "^0.7.0",
     "log4js": "^6.1.2",
-    "mongodb": "^3.5.4"
+    "mongoose": "^5.9.6",
+    "mongoose-auto-increment": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
