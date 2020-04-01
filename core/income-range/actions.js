@@ -8,40 +8,48 @@ const loggerCreateANewIncomeRange = require('../../logger').logger('CreateANewIn
 const loggerDeleteAIncomeRange = require('../../logger').logger('DeleteAIncomeRange');
 const loggerFindAIncomeRange = require('../../logger').logger('FindAIncomeRange');
 const loggerPatchAIncomeRange = require('../../logger').logger('PatchAIncomeRange');
+const { findFirstError } = require('../../database/mongodbutils/ErrorHandler')
 
-actions.createANewIncomeRange = function (req, res) {
-    
+actions.createANewIncomeRange = function (req, res, next) {
+    let logger = loggerCreateANewIncomeRange;
     let data = req.body;
     console.log(`body request ${JSON.stringify(data)}`);
     return new Promise((resolve, reject) => {
 
-        loggerCreateANewIncomeRange.info('"createANewIncomeRange" routine started.');
-        loggerCreateANewIncomeRange.info(`Request: ${JSON.stringify(data)}`);
-        resolve(new IncomeRangeDAO(loggerCreateANewIncomeRange).insert(data));
+        logger.info('"createANewIncomeRange" routine started.');
+        logger.info(`Request: ${JSON.stringify(data)}`);
+        resolve(new IncomeRangeDAO(logger).insert(data));
     }).then(result => {
     
         res.setHeader('Location', `${routes.INCOME_RANGES}/${result.id}`);
         res.statusCode = 201;
         res.end();
         return;
-    }).catch(result => {
-    
-        res.statusCode = 500;
-        res.send({ 'message': 'Was not possible create the object Income Range.', 'error': `${result}` });
-        res.end();
+    }).catch(error => {
+
+        if('ValidationError' === error.name) {
+            logger.info( `Validation error: ${error}.`);
+            
+            let message = new Message('Was not possible create the object Income Range.', req.id, findFirstError(error.errors).message);
+            res.status(400).send(message);
+            res.end();
+            return;      
+        }
+
+        next(error);
         return;
     }).then(() => {
     
-        loggerCreateANewIncomeRange.info('"createANewIncomeRange" routine finished.');
+        logger.info('"createANewIncomeRange" routine finished.');
     });
 };
 
-actions.listIncomeRanges = function (req, res) {
-    
+actions.listIncomeRanges = function (req, res, next) {
+    let logger = loggerListIncomeRanges;
     return new Promise((resolve, reject) => {
     
-        loggerCreateANewIncomeRange.info('"listIncomeRanges" routine started.');
-        resolve(new IncomeRangeDAO(loggerListIncomeRanges).list());
+        logger.info('"listIncomeRanges" routine started.');
+        resolve(new IncomeRangeDAO(logger).list());
     }).then(resolved => {
     
         res.statusCode = 200;
@@ -50,80 +58,130 @@ actions.listIncomeRanges = function (req, res) {
         return;
     }).catch(error => {
     
-        let msg = 'Was not possible to retrive any Income range.';
-        loggerListIncomeRanges.error(`${msg} ${error}`)
-        res.statusCode = 500;
-        res.send(new Message(msg, null));
-        res.end();
+        if('ValidationError' === error.name) {
+            logger.info( `Validation error: ${error}.`);
+
+            let message = new Message('Was not possible to retrive any Income range.', req.id, error);
+            res.status(400).send(message);            
+            res.end();
+            return;      
+        }
+
+        next(error);
         return;
     }).then(() => {
     
-        loggerCreateANewIncomeRange.info('"listIncomeRanges" routine finished.');
+        logger.info('"listIncomeRanges" routine finished.');
     });
 };
 
-actions.deleteAIncomeRange = function (req, res) {
-    
+actions.deleteAIncomeRange = function (req, res, next) {
+    let logger = loggerDeleteAIncomeRange;
     return new Promise((resolve, reject) => {
     
-        loggerDeleteAIncomeRange.info('"deleteAIncomeRange" routine started.');
+        logger.info('"deleteAIncomeRange" routine started.');
         let incomerangeid = parseInt(req.params.id);
-        loggerDeleteAIncomeRange.info(`Request: ${incomerangeid}`);
-        resolve(new IncomeRangeDAO(loggerDeleteAIncomeRange).delete(incomerangeid));
+        logger.info(`Request: id: ${incomerangeid}`);
+        
+        let filter = new Object();
+        filter.id = incomerangeid;
+        let aIncomeRange = new IncomeRangeDAO(logger).findOne(filter);
+
+        resolve(aIncomeRange);
+    }).then(resolved => {
+        logger.info(`Find income range. ${resolved}`);
+
+        if(!resolved) return Promise.reject();
+
+        let incomerangeid = resolved.id;
+        return Promise.resolve(new IncomeRangeDAO(logger).delete(incomerangeid));
     }).then(resolved => {
     
-        let statusCode = resolved.success ? 204 : 404;
+        if(!resolved.success){
+            return Promise.reject();
+        }
+
+        let statusCode = 204
         res.statusCode = statusCode;
         res.end();
         return;
     }).catch(error => {
-    
-        res.statusCode = 500;
-        res.send(`Was not possible to retrive any Income Range, ${error}`);
-        res.end();
+
+        if(!error){
+            logger.info('Resource not found.');
+            res.status(404).send();
+            res.end();
+            return;  
+        }
+
+        if('ValidationError' === error.name) {
+            logger.info( `Validation error: ${error}.`);
+
+            let message = new Message('Was not possible to retrive any Income Range.', req.id, error);
+            res.status(400).send(message);
+            res.end();
+            return;      
+        }
+
+        next(error);
         return;
     }).then(() => {
     
-        loggerDeleteAIncomeRange.debug('"deleteAIncomeRange" routine finished.');
+        logger.debug('"deleteAIncomeRange" routine finished.');
     });
 };
 
-actions.findAIncomeRange = function (req, res) {
-    
+actions.findAIncomeRange = function (req, res, next) {
+    let logger = loggerFindAIncomeRange;
     return new Promise((resolve, reject) => {
         
-        loggerFindAIncomeRange.info('"findAIncomeRange" routine started.');
+        logger.info('"findAIncomeRange" routine started.');
         let incomerangeid = isNaN(req.params.id) ? 0 : parseInt(req.params.id);
-        loggerFindAIncomeRange.info(`Request: ${JSON.stringify(req.params)}`);
+        logger.info(`Request: ${JSON.stringify(req.params)}`);
         if (incomerangeid === 0) {
             return resolve();
         }
 
         let filter = new Object();
         filter.id = incomerangeid;
-        resolve(new IncomeRangeDAO(loggerFindAIncomeRange).findOne(filter));
+        resolve(new IncomeRangeDAO(logger).findOne(filter));
     }).then(resolved => {
+
+        if(!resolved) return Promise.reject();
     
-        res.statusCode = resolved ? 200 : 404;
-        res.send(resolved);
+        res.status(200).send(resolved);
         res.end();
         return;
     }).catch(error => {
     
-        res.statusCode = 500;
-        res.send(`Was not possible to retrive any Income Range, ${error}`);
-        res.end();
+        if(!error) {
+            logger.info('Resource not found.');
+            res.status(404).send(resolved);
+            res.end();
+            return;
+        }
+
+        if('ValidationError' === error.name) {
+            logger.info( `Validation error: ${error}.`);
+
+            let message = new Message('Was not possible to retrive any Income Range.', req.id, error);
+            res.status(400).send(message);
+            res.end();
+            return;
+        }
+
+        next(error);
         return;
     }).then(() => {
     
-        loggerFindAIncomeRange.info('"findAIncomeRange" routine finished.');
+        logger.info('"findAIncomeRange" routine finished.');
     });
 };
 
-actions.patchAIncomeRange = function (req, res) {
-    
-    loggerPatchAIncomeRange.info('"patchAIncomeRange" routine started.');
-    loggerPatchAIncomeRange.info(`Request: ${JSON.stringify(req.params)} ${JSON.stringify(req.body)}`);
+actions.patchAIncomeRange = function (req, res, next) {
+    let logger = loggerPatchAIncomeRange;
+    logger.info('"patchAIncomeRange" routine started.');
+    logger.info(`Request: ${JSON.stringify(req.params)} ${JSON.stringify(req.body)}`);
     let incomerangeid = isNaN(req.params.id) ? 0 : parseInt(req.params.id);
     let { patches } = req.body;
     return new Promise((resolve, reject) => {
@@ -134,40 +192,48 @@ actions.patchAIncomeRange = function (req, res) {
 
         let filter = new Object();
         filter.id = incomerangeid;
-        let aIncomeRange = new IncomeRangeDAO(loggerPatchAIncomeRange).findOne(filter);
+        let aIncomeRange = new IncomeRangeDAO(logger).findOne(filter);
 
         resolve(aIncomeRange);
     }).then(aIncomeRange => {
         
         if (aIncomeRange) {
-            loggerPatchAIncomeRange.info(`Income Range found: ${JSON.stringify(aIncomeRange)}`);
+            logger.info(`Income Range found: ${JSON.stringify(aIncomeRange)}`);
             jsonPatch.apply(aIncomeRange, patches);
-            return Promise.resolve(new IncomeRangeDAO(loggerPatchAIncomeRange).patch(incomerangeid, aIncomeRange));
+            return Promise.resolve(new IncomeRangeDAO(logger).patch(incomerangeid, aIncomeRange));
         }
 
-        loggerPatchAIncomeRange.info(`Income Range not found: ${aIncomeRange}`);
-        return Promise.resolve();
+        logger.info(`Income Range not found: ${aIncomeRange}`);
+        return Promise.reject();
     }).then(resolved => {
-
-        if (!resolved) {
-            res.status(404);
-            res.end();
-            loggerPatchAIncomeRange.info('404 code returned to client.');
-            return ;
-        }
 
         res.status(204);
         res.setHeader('Location', req.path);
         res.end();
-        loggerPatchAIncomeRange.info(`204 code returned to client. ${JSON.stringify(resolved)}`);
+        logger.info(`204 code returned to client. ${JSON.stringify(resolved)}`);
         return ;
     }).catch(error => {
         
-        let message = new Message(`Was not possible perform operation, sorry about that. Wait a minute and try later or, if the problem persists, contact the administrator. ;)`);
-        res.status(500).send(message);
-        res.end();
+        if (!error) {
+            logger.info('Resource not found.');
+            res.status(404).send();
+            res.end();
+            return ;
+        }
+
+        if('ValidationError' === error.name || 'PatchConflictError' === error.name) {
+            logger.info( `Validation error: ${error}.`);
+            
+            let message = new Message(error.message, req.id);
+            res.status(400).send(message);
+            res.end();
+            return;
+        }
+
+        next(error);
+        return;
     }).then(() => {
-        loggerPatchAIncomeRange.info('"patchAIncomeRange" routine finished.');
+        logger.info('"patchAIncomeRange" routine finished.');
     });
 };
 
