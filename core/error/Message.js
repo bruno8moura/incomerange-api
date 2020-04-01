@@ -1,17 +1,13 @@
 class Message {
-    constructor(friendlyMessage, error=new Object()) {
-        this._message = friendlyMessage;
+    constructor(friendlyMessage, id, error) {
+        this.description = friendlyMessage;
         if(!friendlyMessage) throw new Error('A \'friendlyMessage\' must be set.');
         
-        this._error = error;              
-    }
+        if(id)
+            this.id = id;
 
-    get Message() {
-        return this._message;
-    }
-
-    get Error() {
-        return this._error;
+        if(error)
+            this.error = error;
     }
 }
 

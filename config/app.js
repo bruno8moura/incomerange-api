@@ -12,5 +12,6 @@ express_config.app = app;
 express_config.router = express.Router();
 
 require('../core/income-range')(express_config);
+require('./error')(app);
 module.exports = express_config;
 
