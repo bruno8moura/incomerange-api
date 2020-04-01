@@ -3,6 +3,15 @@ let config = (requestId) => {
     "appenders": {
       "app": {
         "type": "file",
+        "layout": {
+          "type": "pattern",
+          "pattern": "%d %p %c %x{requestId} %m%n",
+          "tokens": {
+            "requestId": function (logEvent) {
+              return requestId ? `[${requestId}]` : '';
+            }
+          }
+        },
         "filename": "logs/app.log",
         "maxLogSize": 10485760,
         "numBackups": 3
