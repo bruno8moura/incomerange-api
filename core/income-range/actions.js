@@ -30,7 +30,7 @@ actions.createANewIncomeRange = function (req, res, next) {
         if('ValidationError' === error.name) {
             logger.info( `Validation error: ${error}.`);
             
-            let message = new Message('Was not possible create the object Income Range.', req.id, findFirstError(error.errors).message);
+            let message = new Message('Was not possible create the object Income Range.', req['x-request-id'], findFirstError(error.errors).message);
             res.status(400).send(message);
             res.end();
             return;      
@@ -61,7 +61,7 @@ actions.listIncomeRanges = function (req, res, next) {
         if('ValidationError' === error.name) {
             logger.info( `Validation error: ${error}.`);
 
-            let message = new Message('Was not possible to retrive any Income range.', req.id, error);
+            let message = new Message('Was not possible to retrive any Income range.', req['x-request-id'], error);
             res.status(400).send(message);            
             res.end();
             return;      
@@ -117,7 +117,7 @@ actions.deleteAIncomeRange = function (req, res, next) {
         if('ValidationError' === error.name) {
             logger.info( `Validation error: ${error}.`);
 
-            let message = new Message('Was not possible to retrive any Income Range.', req.id, error);
+            let message = new Message('Was not possible to retrive any Income Range.', req['x-request-id'], error);
             res.status(400).send(message);
             res.end();
             return;      
@@ -164,7 +164,7 @@ actions.findAIncomeRange = function (req, res, next) {
         if('ValidationError' === error.name) {
             logger.info( `Validation error: ${error}.`);
 
-            let message = new Message('Was not possible to retrive any Income Range.', req.id, error);
+            let message = new Message('Was not possible to retrive any Income Range.', req['x-request-id'], error);
             res.status(400).send(message);
             res.end();
             return;
@@ -224,7 +224,7 @@ actions.patchAIncomeRange = function (req, res, next) {
         if('ValidationError' === error.name || 'PatchConflictError' === error.name) {
             logger.info( `Validation error: ${error}.`);
             
-            let message = new Message(error.message, req.id);
+            let message = new Message(error.message, req['x-request-id']);
             res.status(400).send(message);
             res.end();
             return;
