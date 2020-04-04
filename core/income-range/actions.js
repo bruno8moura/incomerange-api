@@ -156,7 +156,7 @@ actions.findAIncomeRange = function (req, res, next) {
     
         if(!error) {
             logger.info('Resource not found.');
-            res.status(404).send(resolved);
+            res.status(404).send();
             res.end();
             return;
         }
