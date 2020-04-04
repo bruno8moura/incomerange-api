@@ -1,0 +1,276 @@
+swagger: "2.0"
+info:
+  description: "An API for CRUD information about income range."
+  version: "1.0.0"
+  title: "Income Range API"
+  termsOfService: "https://github.com/brunocmoura/incomerange-api/blob/master/CODE_OF_CONDUCT.md"
+  contact:
+    email: "bruno8moura@gmail.com"
+  license:
+    name: "MIT License"
+    url: "https://github.com/brunocmoura/incomerange-api/blob/developer/LICENSE"
+host: "localhost:3000"
+basePath: "/"
+tags:
+  - name: "incomerange"
+    description: "CRUD everything about Income Range"
+    externalDocs:
+      description: "Visit us on Github fr more information"
+      url: "https://github.com/brunocmoura/incomerange-api"
+schemes:
+  - http
+paths:
+  /incomeranges:
+    post:
+      tags:
+        - "incomerange"
+      summary: "Add a new income range"
+      description: "Not Idempotent."
+      operationId: "addIncomeRange"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "header"
+          name: "X-Request-ID"
+          type: "string"
+          description: "Used when the client wants tracking the request"
+          required: false
+        - in: "body"
+          name: "body"
+          description: "A income range that will be added to database"
+          required: true
+          schema:
+            $ref: "#/definitions/IncomeRange"
+      responses:
+        201:
+          description: "The resource was created"
+          headers:
+            Location:
+              type: "string"
+              format: "/incomeranges/{id}"
+              description: "The path where resource is available"
+        400:
+          description: "The user failed to enter a information or a required field"
+          schema:
+            $ref: "#/definitions/Message"
+    get:
+      tags:
+        - "incomerange"
+      summary: "Retrive a list of income ranges"
+      description: "Idempotent. \n\nNo more then 500(five hundred) rows will be retrive within a request"
+      operationId: "listIncomeRange"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "header"
+          name: "X-Request-ID"
+          type: "string"
+          description: "Used when the client wants tracking the request"
+          required: false
+        - in: "query"
+          name: "min"
+          type: "integer"
+          format: "int64"
+          description: "Compares against min field"
+          required: false
+        - in: "query"
+          name: "max"
+          type: "integer"
+          format: "int64"
+          description: "Compares against max field"
+          required: false
+        - in: "query"
+          name: "currency"
+          type: "string"
+          description: "Compares against currency field"
+          required: false
+        - in: "query"
+          name: "just"
+          type: "string"
+          enum: [eq, le, ge, lt, gt]
+          description: "Enabled for min and max fields only.\n Acts like the signals =, <, >, <=, >=.\n Enabled to use with fields min and max.\n Passes this parameter right after the field that is intended to use with.\n e.g. ?min=3000&just=gt&max=6000&just=lt i.e. range from 3001 up to 5999"
+          required: false
+      responses:
+        200:
+          description: "The list of resources found"
+          schema:
+            $ref: '#/definitions/IncomeRangeList'
+        404:
+          description: "When there are query parameters and none resource matches with it, this code will returned."
+  /incomeranges/{id}:
+    patch:
+      tags:
+        - "incomerange"
+      summary: "Modify a income range"
+      description: "Idempotent. \n\nJSON PATCH https://tools.ietf.org/html/rfc6902."
+      operationId: "updateIncomeRange"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The path to the resource, income range id"
+          required: true
+          type: "integer"
+          format: "int64"
+        - in: "header"
+          name: "X-Request-ID"
+          type: "string"
+          description: "Used when the client wants tracking the request"
+          required: false
+        - in: "body"
+          name: "body"
+          description: "Do partial modifications on an object"
+          required: true
+          schema:
+            $ref: "#/definitions/IncomeRangePatch"
+      responses:
+        204:
+          description: "The resource was updated"
+          headers:
+            Location:
+              type: "string"
+              description: "/incomeranges/{id}"
+        400:
+          description: "The user failed to enter a information or chose a field that isn't in the document"
+          schema:
+            $ref: "#/definitions/Message"
+        404:
+          description: "Nothing to do. Resource not found"
+    delete:
+      tags:
+        - "incomerange"
+      summary: "Logically deletes a income range"
+      description: "Idempotent."
+      operationId: "deleteIncomeRange"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The path to the resource, income range id"
+          required: true
+          type: "integer"
+          format: "int64"
+        - in: "header"
+          name: "X-Request-ID"
+          type: "string"
+          description: "Used when the client wants tracking the request"
+          required: false
+      responses:
+        204:
+          description: "When found, already deleted or not, always return this code."
+        404:
+          description: "Nothing to do. Resource not found"
+    get:
+      tags:
+        - "incomerange"
+      summary: "Retrive a income range"
+      description: "Idempotent."
+      operationId: "getAIncomeRange"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The path to the resource, income range id"
+          required: true
+          type: "integer"
+          format: "int64"
+        - in: "header"
+          name: "X-Request-ID"
+          type: "string"
+          description: "Used when the client wants tracking the request"
+          required: false
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/IncomeRange"
+        404:
+          description: "Nothing to do. Resource not found"
+definitions:
+  IncomeRange:
+    type: "object"
+    required:
+      - "min"
+      - "max"
+      - "currency"
+    properties:
+      _id:
+        type: "string"
+        description: "Database identifier"
+      id:
+        type: "integer"
+        format: "int64"
+        description: "Public identifier"
+      min:
+        type: "integer"
+        format: "int64"
+      max:
+        type: "integer"
+        format: "int64"
+      currency:
+        type: "string"
+      currencyDesc:
+        type: "string"
+      enabled:
+        type: "boolean"
+      __v:
+        type: "integer"
+        format: "int64"
+        description: "Object's current version"
+  Message:
+    type: "object"
+    required:
+      - "description"
+    properties:
+      description:
+        type: "string"
+        description: "A superficial description"
+      id:
+        type: "string"
+        description: "The request id"
+      error:
+        type: "string"
+        description: "The error's root cause"
+  Patch:
+    type: "object"
+    required:
+      - "op"
+      - "path"
+      - "value"
+    properties:
+      op:
+        type: "string"
+        description: "Only 'replace' operation is available"
+      path:
+        type: "string"
+        description: "The path to the resource field"
+      value:
+        type: "string"
+        description: "The new value"
+  IncomeRangePatch:
+    type: "object"
+    required:
+      - "patches"
+    properties:
+      patches:
+        type: "array"
+        items:
+          $ref: "#/definitions/Patch"
+  IncomeRangeList:
+    type: "object"
+    required:
+      - "incomeranges"
+    properties:
+      incomeranges:
+        type: "array"
+        items:
+          $ref: '#/definitions/IncomeRange'
