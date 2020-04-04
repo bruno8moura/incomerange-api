@@ -237,4 +237,8 @@ actions.patchAIncomeRange = function (req, res, next) {
     });
 };
 
+actions.contract = function(req, res){
+    res.redirect(`${routes.INCOME_RANGES_CONTRACT}/swagger20.yaml`);
+}
+
 module.exports = actions;
