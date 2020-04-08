@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "hello-world": "bash ./bin/startup/hello-world"
   },
   "keywords": [],
   "author": "",
