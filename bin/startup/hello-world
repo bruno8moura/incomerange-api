@@ -1,0 +1,36 @@
+#!/bin/bash
+{
+    #NOTICE: THIS SCRIPT IS ONLY FOR 'HELLO WORLD' PURPOSE.
+
+    #if there is any container named income-range-api1, so delete it e create again.
+    docker container stop income-range-api1 && docker rm income-range-api1
+    
+    echo 'Starting a mongo container...'
+    docker run -it --name income-range-api1 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin -d -p 28017:27017 mongo
+
+    #echo 'Stoping mongo container...'
+    #docker container stop income-range-api1
+
+    #echo 'Restarting mongo container...'
+    #docker container start income-range-api1
+
+    echo 'Waiting 5 seconds, waiting container finishing start up'
+    sleep 5
+
+    echo 'Connecting to mongo database and create database customdatadb...'
+    mongo mongodb://localhost:28017/customdatadb ./bin/startup/create-collection.js
+ 
+    echo 'Connecting to mongo database, create user incomerage for a database customdatadb...'
+    mongo mongodb://admin:admin@localhost:28017/admin ./bin/startup/create-app-user.js   
+
+    echo "Installing application's dependencies..."
+    npm install
+
+    echo "API Contract: localhost:3000/incomeranges/contract"
+    echo "Starting application..."
+    npm start
+    
+} || {
+    docker container stop income-range-api1 && docker rm income-range-api1
+}
+

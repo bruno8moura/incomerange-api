@@ -13,7 +13,7 @@ module.exports = ({ app, router }) => {
 
     router.patch( routes.A_INCOME_RANGE, actions.patchAIncomeRange );
 
-    app.get(routes.CONTRACT, actions.contract);
+    app.get(routes.INCOME_RANGES_CONTRACT, actions.contract);
     
     app.use(routes.BASE, router);
 };

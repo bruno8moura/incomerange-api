@@ -7,5 +7,6 @@
         "sequence": "sequence"
     },
     "user": "incomerange",
-    "password": "incomerange1234"
+    "password": "incomerange1234",
+    "authSource": "admin"
 }

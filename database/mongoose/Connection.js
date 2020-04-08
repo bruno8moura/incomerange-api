@@ -9,7 +9,7 @@ class Connection {
         this.isConnected = false;
 
 
-        let url = `mongodb://${mongodb.user}:${mongodb.password}@${mongodb.host}:${mongodb.port}/${mongodb.database}`;
+        let url = `mongodb://${mongodb.user}:${mongodb.password}@${mongodb.host}:${mongodb.port}/${mongodb.database}?authSource=${mongodb.authSource}`;
         mongoose
             .connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
             .catch(e => {//Initial errors connection, the connection will not be retryed

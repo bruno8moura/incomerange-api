@@ -1,4 +1,6 @@
-const { app } = require('./config/app');
+#!/usr/bin/env node
+
+const { app } = require('../config/app');
 const PORT = 'port';
 
 app.set(PORT, process.env.PORT || 3000);

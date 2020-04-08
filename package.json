@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon ./bin/www",
+    "hello-world": "bash ./bin/startup/hello-world"
   },
   "keywords": [],
   "author": "",
