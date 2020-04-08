@@ -44,11 +44,9 @@ $ cd incomerange-api
 ### Running application
 
 ```
-$ cd bin/startup
+$ echo 'Don't forget to grant the necessaries permissions to the script, ./bin/startup/hello-world, to run'
 
-$ echo 'Don't forget to grant the necessaries permissions to the script to run'
-
-$ ./hello-world
+$ npm run hello-world
 ```
 
 ## Build with
