@@ -21,7 +21,7 @@ It's free!
 
 ## Contact info
 
-My [LinkedIn](https://www.linkedin.com/in/brunomoura1/)
+My [LinkedIn](https://www.linkedin.com/in/bruno8moura/)
 
 My email bruno8moura@gmail.com
 
